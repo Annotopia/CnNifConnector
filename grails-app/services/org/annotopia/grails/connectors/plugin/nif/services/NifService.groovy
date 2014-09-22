@@ -27,6 +27,7 @@ import groovyx.net.http.Method
 import java.util.HashMap;
 
 import org.annotopia.grails.connectors.ConnectorsConfigAccessService
+import org.annotopia.grails.connectors.IConnectorsParameters
 import org.annotopia.grails.connectors.ITermSearchService
 import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTermSearchConversionService
 import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTermSearchDomeoConversionService
@@ -67,10 +68,14 @@ class NifService implements ITermSearchService {
 				response.success = { resp, json ->
 					long duration = System.currentTimeMillis( ) - startTime;
 					
-					JSONObject converted = new NifTermSearchConversionService( ).convert(json, duration);
-					//JSONObject converted = new NifTermSearchDomeoConversionService( ).convert(json);
-										
-					return converted;
+					boolean isFormatDefined = parameters.containsKey(IConnectorsParameters.RETURN_FORMAT);
+					if(isFormatDefined && parameters.get(IConnectorsParameters.RETURN_FORMAT)
+							.equals(NifTermSearchDomeoConversionService.RETURN_FORMAT))
+					{
+						return new NifTermSearchDomeoConversionService( ).convert(json);
+					} else {
+						return new NifTermSearchConversionService( ).convert(json, duration);
+					}
 				}
 			}
 		} catch(Exception e) {

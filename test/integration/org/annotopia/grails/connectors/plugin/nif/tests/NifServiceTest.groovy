@@ -45,11 +45,25 @@ class NifServiceTest {
 	}
 
 	@Test
-	public void testSearch( ) {
-		log.info("TEST:testSearch");
+	public void termSearchTest( ) {
+		log.info("TEST:termSearchTest");
 		
 		HashMap parameters = new HashMap( );
 		parameters.put("resource", "nlx_144509-1");
+
+		JSONObject result = nifService.search("plank", parameters);
+		System.out.println("\n");
+		System.out.println(result);
+		assertNotNull(result);
+	}
+	
+	@Test
+	public void termSearchDomeoTest( ) {
+		log.info("TEST:termSearchDomeoTest");
+		
+		HashMap parameters = new HashMap( );
+		parameters.put("resource", "nlx_144509-1");
+		parameters.put("returnFormat", "domeo");
 
 		JSONObject result = nifService.search("plank", parameters);
 		System.out.println("\n");

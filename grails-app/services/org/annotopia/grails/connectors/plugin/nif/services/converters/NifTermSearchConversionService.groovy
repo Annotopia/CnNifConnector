@@ -27,6 +27,9 @@ import org.codehaus.groovy.grails.web.json.JSONObject
  * @author Tom Wilkin */
 class NifTermSearchConversionService {
 
+	/** The return format that this conversion service generates. */
+	public static final String RETURN_FORMAT = "annotopia";
+	
 	/** Convert the returned JSON into the correct format returned by Annotopia.
 	 * @param response The JSON response from the web service.
 	 * @param duration The number of milliseconds that the query took.

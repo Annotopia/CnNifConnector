@@ -26,6 +26,9 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 /** Convert the terms returned by the Nif Service into the Domeo format.
  * @author Tom Wilkin */
 class NifTermSearchDomeoConversionService {
+	
+	/** The return format that this conversion service generates. */
+	public static final String RETURN_FORMAT = "domeo";
 
 	/** Convert the returned JSON into the correct format for consumption by Domeo.
 	 * @param response The JSON response from the web service.
