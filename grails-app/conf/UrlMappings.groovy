@@ -1,6 +1,12 @@
 class UrlMappings {
 
 	static mappings = {
+		
+		"/cn/nif/search" {
+			controller = "nif"
+			action = [GET: "search"]
+		}
+		
 		"/$controller/$action?/$id?"{
 			constraints {
 				// apply constraints here
@@ -10,4 +16,5 @@ class UrlMappings {
 		"/"(view:"/index")
 		"500"(view:'/error')
 	}
+	
 }
