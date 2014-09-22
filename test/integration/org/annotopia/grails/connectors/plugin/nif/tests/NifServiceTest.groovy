@@ -20,6 +20,41 @@
  */
 package org.annotopia.grails.connectors.plugin.nif.tests
 
-class NifServiceTest {
+import static org.junit.Assert.*
+import grails.test.mixin.TestFor
 
-}
+import org.annotopia.grails.connectors.ITextMiningService
+import org.annotopia.grails.connectors.plugin.nif.services.NifService
+import org.codehaus.groovy.grails.web.json.JSONObject
+import org.junit.BeforeClass
+import org.junit.Test
+
+/** 
+ * JUnit test case for the term search.
+ * @author Tom Wilkin 
+ */
+@TestFor(NifService)
+class NifServiceTest {
+	
+	/** The instance of the Nif Service. */
+	def static nifService;
+	
+	@BeforeClass
+	public static void initialise( ) {
+		nifService = new NifService( );
+	}
+
+	@Test
+	public void testSearch( ) {
+		log.info("TEST:testSearch");
+		
+		HashMap parameters = new HashMap( );
+		parameters.put("resource", "nlx_144509-1");
+
+		JSONObject result = nifService.search("plank", parameters);
+		System.out.println("\n");
+		System.out.println(result);
+		assertNotNull(result);
+	}
+	
+};

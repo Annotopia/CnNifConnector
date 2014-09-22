@@ -20,17 +20,72 @@
  */
 package org.annotopia.grails.connectors.plugin.nif.services
 
+import groovy.json.JsonSlurper
+import groovyx.net.http.ContentType
+import groovyx.net.http.HTTPBuilder
+import groovyx.net.http.Method
 import java.util.HashMap;
 
+import org.annotopia.grails.connectors.ConnectorsConfigAccessService
 import org.annotopia.grails.connectors.ITermSearchService
+import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTermSearchConversionService
+import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTermSearchDomeoConversionService
+import org.apache.http.HttpHost
+import org.apache.http.conn.params.ConnRoutePNames
 import org.codehaus.groovy.grails.web.json.JSONObject;
 
+/**
+ * Implementation of the Nif Term Search connector for Annotopia.
+ * @author Tom Wilkin
+ */
 class NifService implements ITermSearchService {
+	
+	/** The URL to access the Term Search API. */
+	private final static String TERM_SEARCH_URL = "http://neuinfo.org/servicesv1/v1/federation/data/";
+	
+	/** The configuration options for this service. */
+	def connectorsConfigAccessService;
 
 	@Override
-	public JSONObject search(String content, HashMap parameters) {
-		// TODO Auto-generated method stub
-		return null;
+	public JSONObject search(final String content, final HashMap parameters) {
+		
+		// create the URL
+		String resource = parameters.get("resource");
+		def url = TERM_SEARCH_URL + resource + "?exportType=all";
+		if(content != null) {
+			url += "&q=" + content;
+		}
+		
+		long startTime = System.currentTimeMillis( );
+		try {
+			def http = new HTTPBuilder(url);
+			evaluateProxy(http, url);
+			
+			http.request(Method.GET, ContentType.JSON) {
+				requestContentType = ContentType.URLENC
+				
+				response.success = { resp, json ->
+					long duration = System.currentTimeMillis( ) - startTime;
+					
+					JSONObject converted = new NifTermSearchConversionService( ).convert(json, duration);
+					//JSONObject converted = new NifTermSearchDomeoConversionService( ).convert(json);
+										
+					return converted;
+				}
+			}
+		} catch(Exception e) {
+			e.printStackTrace( );
+			return null;
+		}
+	}
+	
+	private void evaluateProxy(HTTPBuilder http, String uri) {
+		if(connectorsConfigAccessService.isProxyDefined()) {
+			log.info("proxy: " + connectorsConfigAccessService.getProxyIp() + "-" + connectorsConfigAccessService.getProxyPort());
+			http.client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, connectorsConfigAccessService.getProxyHttpHost());
+		} else {
+			log.info("NO PROXY selected while accessing " + uri);
+		}
 	}
 
-}
+};
