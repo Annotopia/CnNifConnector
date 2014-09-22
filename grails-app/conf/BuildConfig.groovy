@@ -29,7 +29,7 @@ grails.project.dependency.resolution = {
             export = false
         }
 			  
-	  runtime ":hibernate:$grailsVersion"
-	  compile ":rest:0.8"
+	    runtime ":hibernate:$grailsVersion"
+	    compile ":rest:0.8"
     }
 }

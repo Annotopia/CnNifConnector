@@ -52,8 +52,8 @@ class NifServiceTest {
 		parameters.put("resource", "nlx_144509-1");
 
 		JSONObject result = nifService.search("plank", parameters);
-		System.out.println("\n");
-		System.out.println(result);
+		log.trace("\n");
+		log.trace(result);
 		assertNotNull(result);
 	}
 	
