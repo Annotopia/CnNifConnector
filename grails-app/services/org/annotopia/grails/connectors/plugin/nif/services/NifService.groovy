@@ -24,8 +24,10 @@ import groovy.json.JsonSlurper
 import groovyx.net.http.ContentType
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.Method
+
 import java.util.HashMap;
 
+import org.annotopia.grails.connectors.BaseConnectorService;
 import org.annotopia.grails.connectors.ConnectorsConfigAccessService
 import org.annotopia.grails.connectors.IConnectorsParameters
 import org.annotopia.grails.connectors.ITermSearchService
@@ -39,7 +41,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject;
  * Implementation of the Nif Term Search connector for Annotopia.
  * @author Tom Wilkin
  */
-class NifService implements ITermSearchService {
+class NifService extends BaseConnectorService implements ITermSearchService {
 	
 	/** The URL to access the Term Search API. */
 	private final static String TERM_SEARCH_URL = "http://neuinfo.org/servicesv1/v1/federation/data/";
@@ -83,14 +85,4 @@ class NifService implements ITermSearchService {
 			return null;
 		}
 	}
-	
-	private void evaluateProxy(HTTPBuilder http, String uri) {
-		if(connectorsConfigAccessService.isProxyDefined()) {
-			log.info("proxy: " + connectorsConfigAccessService.getProxyIp() + "-" + connectorsConfigAccessService.getProxyPort());
-			http.client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, connectorsConfigAccessService.getProxyHttpHost());
-		} else {
-			log.info("NO PROXY selected while accessing " + uri);
-		}
-	}
-
 };
