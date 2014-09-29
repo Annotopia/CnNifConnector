@@ -2,9 +2,15 @@ class UrlMappings {
 
 	static mappings = {
 		
+		// Nif Connector
 		"/cn/nif/search" {
 			controller = "nif"
 			action = [GET: "search"]
+		}
+		
+		"/cn/nif/textmine" {
+			controller = "nif"
+			action = [GET: "textmine"]
 		}
 		
 		"/$controller/$action?/$id?"{

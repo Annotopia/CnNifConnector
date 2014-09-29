@@ -66,6 +66,18 @@ class NifServiceTest {
 		parameters.put("returnFormat", "domeo");
 
 		JSONObject result = nifService.search("plank", parameters);
+		log.trace("\n");
+		log.trace(result);
+		assertNotNull(result);
+	}
+	
+	@Test
+	public void textMiningTest( ) {
+		System.out.println("TEST:textMiningTest");
+		
+		HashMap parameters = new HashMap( );
+		
+		JSONObject result = nifService.textmine("url", "APP is bad for you.", parameters);
 		System.out.println("\n");
 		System.out.println(result);
 		assertNotNull(result);

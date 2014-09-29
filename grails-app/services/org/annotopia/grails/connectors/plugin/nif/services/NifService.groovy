@@ -26,11 +26,16 @@ import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.Method
 import java.util.HashMap;
 
+import org.annotopia.grails.connectors.BaseConnectorService
 import org.annotopia.grails.connectors.ConnectorsConfigAccessService
 import org.annotopia.grails.connectors.IConnectorsParameters
 import org.annotopia.grails.connectors.ITermSearchService
+import org.annotopia.grails.connectors.ITextMiningService
+import org.annotopia.grails.connectors.MiscUtils;
 import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTermSearchConversionService
 import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTermSearchDomeoConversionService
+import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTextMiningConversionService
+import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTextMiningDomeoConversionService
 import org.apache.http.HttpHost
 import org.apache.http.conn.params.ConnRoutePNames
 import org.codehaus.groovy.grails.web.json.JSONObject;
@@ -39,10 +44,13 @@ import org.codehaus.groovy.grails.web.json.JSONObject;
  * Implementation of the Nif Term Search connector for Annotopia.
  * @author Tom Wilkin
  */
-class NifService implements ITermSearchService {
+class NifService extends BaseConnectorService implements ITermSearchService, ITextMiningService {
 	
 	/** The URL to access the Term Search API. */
 	private final static String TERM_SEARCH_URL = "http://neuinfo.org/servicesv1/v1/federation/data/";
+	
+	/** The URL to access the Text Mining API. */
+	private final static String TEXT_MINING_URL = "http://beta.neuinfo.org/services/v1/annotate/entities";
 	
 	/** The configuration options for this service. */
 	def connectorsConfigAccessService;
@@ -54,9 +62,10 @@ class NifService implements ITermSearchService {
 		String resource = parameters.get("resource");
 		def url = TERM_SEARCH_URL + resource + "?exportType=all";
 		if(content != null) {
-			url += "&q=" + content;
+			url += "&q=" + encodeContent(content);
 		}
 		
+		// perform the query
 		long startTime = System.currentTimeMillis( );
 		try {
 			def http = new HTTPBuilder(url);
@@ -68,6 +77,7 @@ class NifService implements ITermSearchService {
 				response.success = { resp, json ->
 					long duration = System.currentTimeMillis( ) - startTime;
 					
+					// convert the result
 					boolean isFormatDefined = parameters.containsKey(IConnectorsParameters.RETURN_FORMAT);
 					if(isFormatDefined && parameters.get(IConnectorsParameters.RETURN_FORMAT)
 							.equals(NifTermSearchDomeoConversionService.RETURN_FORMAT))
@@ -84,12 +94,53 @@ class NifService implements ITermSearchService {
 		}
 	}
 	
-	private void evaluateProxy(HTTPBuilder http, String uri) {
-		if(connectorsConfigAccessService.isProxyDefined()) {
-			log.info("proxy: " + connectorsConfigAccessService.getProxyIp() + "-" + connectorsConfigAccessService.getProxyPort());
-			http.client.getParams().setParameter(ConnRoutePNames.DEFAULT_PROXY, connectorsConfigAccessService.getProxyHttpHost());
+	@Override
+	public JSONObject textmine(final String resourceURI, final String content, 
+		final HashMap parameters)
+	{
+		// create the URL
+		def url = TEXT_MINING_URL + "?content=" + encodeContent(content);
+		String contentText = encodeContent(content);
+		
+		// perform the query
+		long startTime = System.currentTimeMillis( );
+		try {
+			def http = new HTTPBuilder(url);
+			evaluateProxy(http, url);
+			
+			http.request(Method.GET, ContentType.JSON) {
+				requestContentType = ContentType.URLENC;
+				
+				contentText = URLDecoder.decode(contentText, MiscUtils.DEFAULT_ENCODING);
+				
+				response.success = { resp, json ->
+					long duration = System.currentTimeMillis( ) - startTime;
+					
+					// convert the result
+					boolean isFormatDefined = parameters.containsKey(IConnectorsParameters.RETURN_FORMAT);
+					if(isFormatDefined && parameters.get(IConnectorsParameters.RETURN_FORMAT)
+						.equals(NifTextMiningDomeoConversionService.RETURN_FORMAT))
+					{
+						return new NifTextMiningDomeoConversionService( ).convert(json);
+					} else {
+						return new NifTextMiningConversionService( ).convert(json, resourceURI, contentText, duration);
+					}
+				}
+			} 
+		} catch(Exception e) {
+			e.printStackTrace( );
+			return null;
+		}
+	}
+	
+	/** URL encode the content of the given string.
+	 * @param content The content to URL encode.
+	 * @return The URL encoded content. */
+	private String encodeContent(final String content) {
+		if(content == null || content.trim( ).length( ) == 0) { 
+			throw new RuntimeException("No content found.");
 		} else {
-			log.info("NO PROXY selected while accessing " + uri);
+			return URLEncoder.encode(content.trim( ), MiscUtils.DEFAULT_ENCODING);
 		}
 	}
 

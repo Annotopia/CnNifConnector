@@ -22,12 +22,16 @@ package org.annotopia.grails.connectors.plugin.nif.controllers;
 
 import org.annotopia.grails.connectors.BaseController;
 import org.annotopia.grails.connectors.IConnectorsParameters;
+import org.annotopia.grails.connectors.MiscUtils;
 import org.codehaus.groovy.grails.web.json.JSONObject;
 
 /** Controller to handle incoming queries to the NIF text mining service.
  * @author Tom Wilkin */
 class NifController extends BaseController {
 
+	/** The API key authentication service. */
+	def apiKeyAuthenticationService;
+	
 	/** The instance of the NIF service to use for the queries. */
 	def nifService;
 	
@@ -39,54 +43,139 @@ class NifController extends BaseController {
 	def search = {
 		long startTime = System.currentTimeMillis( );
 		
-		// retrieve the return format
-		def format;
-		if(request.JSON.format != null) {
-			format = request.JSON.format;
-		} else if(params.format != null) {
-			format = params.format;
-		} else {
-			format = "annotopia";
+		// retrieve the API key
+		def apiKey = retrieveApiKey(startTime);
+		if(!apiKey) {
+			return;
 		}
 		
+		// retrieve the return format
+		def format = retrieveValue(request.JSON.format, params.format, "annotopia");
+		
 		// retrieve the resource
-		def resource;
-		if(request.JSON.resource != null) {
-			resource = request.JSON.resource;
-		} else if(params.resource != null) {
-			resource = params.resourcel
+		def resource = retrieveValue(request.JSON.resource, params.resource, 
+			"resource", startTime);
+		if(!resource) {
+			return;
 		}
 		
 		// retrieve the query
-		def query;
-		if(request.JSON.q != null) {
-			query = request.JSON.q;
-		} else if(params.q != null) {
-			query = params.q;
-		} else {
-			query = "";
+		def query = retrieveValue(request.JSON.q, params.q, "q", startTime);
+		if(!query) {
+			return;
 		}
 		
 		// perform the query
-		if(query != null && !query.empty && resource != null && !resource.empty) {
-			HashMap parameters = new HashMap( );
-			parameters.put(IConnectorsParameters.RETURN_FORMAT, format);
-			parameters.put("resource", resource);
-			
-			JSONObject results = nifService.search(query, parameters);
-			
-			response.outputStream << results.toString( );
-			response.outputStream.flush( );
-		} else {
-			def message = "Query text is null.";
-			render(
-				status: 200,
-				text: returnMessage("", "nocontent", message, startTime),
-				contentType: "text/json",
-				encoding: "UTF-8"
-			);
+		HashMap parameters = new HashMap( );
+		parameters.put(IConnectorsParameters.RETURN_FORMAT, format);
+		parameters.put("resource", resource);
+		
+		JSONObject results = nifService.search(query, parameters);
+		
+		response.outputStream << results.toString( );
+		response.outputStream.flush( );	
+	}
+	
+	// curl -i -X POST http://localhost:8080/cn/nif/textmine --header "Content-Type: application/json" --data '{"apiKey":"testKey","text":"APP is bad for you","offset":"1","format":"annotopia"}'
+	/** Perform text mining and return the JSON results.
+	 * @param apiKey The API key to communicate with Annotopia.
+	 * @param format The output format to return.
+	 * @param text The text to text mine. */
+	def textmine = {
+		long startTime = System.currentTimeMillis( );
+		
+		// retrieve the API key
+		def apiKey = retrieveApiKey(startTime);
+		if(!apiKey) {
 			return;
-		}		
+		}
+		
+		// retrieve the return format
+		def format = retrieveValue(request.JSON.format, params.format, "annotopia");
+		
+		// retrieve the text to mine
+		def text = retrieveValue(request.JSON.text, params.text, "text", startTime);
+		if(!text) {
+			return;
+		}
+		
+		// perform the query
+		HashMap parameters = new HashMap( );
+		parameters.put(IConnectorsParameters.RETURN_FORMAT, format);
+		JSONObject results = nifService.textmine(null, text, parameters);
+		
+		response.outputStream << results.toString( );
+		response.outputStream.flush( );
+	}
+	
+	/** Retrieve the API key value.
+	 * @param startTime The time this execution was started.
+	 * @return The value of the API key, or null if it is not set. */
+	private String retrieveApiKey(final long startTime) {
+		// retrieve the API key
+		def apiKey = retrieveValue(request.JSON.apiKey, params.apiKey, 
+				"Missing required parameter 'apiKey'.", startTime);
+		if(!apiKeyAuthenticationService.isApiKeyValid(request.getRemoteAddr( ), apiKey)) {
+			invalidApiKey(request.getRemoteAddr( ));
+			return null;
+		}
+		
+		return apiKey;
+	}
+	
+	/** Retrieve the user parameter.
+	 * @param requestParam The parameter if it exists in the POST data.
+	 * @param param The parameter if it exists in the URL.
+	 * @param name The name of this parameter.
+	 * @param startTime The time this execution was started.
+	 * @return The value of this parameter, or null if it is not set. */
+	private String retrieveValue(final String requestParam, final String param, final String name, 
+			final long startTime)
+	{
+		def result;
+		if(requestParam != null) {
+			result = requestParam;
+		} else if(param != null) {
+			result = URLDecoder.decode(param, MiscUtils.DEFAULT_ENCODING);
+		} else {
+			error(400, "Missing required parameter '" + name + "'.", startTime);
+			return null;
+		}
+		
+		if(result.isEmpty( )) {
+			error(400, "Parameter '" + name + "' is empty.", startTime);
+		}
+		return result;
+	}
+	
+	/** Retrieve the user parameter.
+	 * @param requestParam The parameter if it exists in the POST data.
+	 * @param param The parameter if it exists in the URL.
+	 * @param defaultValue The default value to use if the parameter is not set.
+	 * @return The value of this parameter. */
+	private String retrieveValue(final String requestParam, final String param, 
+			final String defaultValue)
+	{
+		if(requestParam != null) {
+			return requestParam;
+		} else if(param != null) {
+			return URLDecoder.decode(param, MiscUtils.DEFAULT_ENCODING);
+		} 
+		return defaultValue;
+	}
+	
+	/** Generate an error with the specified details.
+	 * @param code The HTTP error code to use.
+	 * @param message The error message to report to the user.
+	 * @param startTime The time the web service call was initiated. */
+	private void error(final int code, final String message, final long startTime) {
+		log.warn(message);
+		render(
+			status: code,
+			text: returnMessage("", "nocontent", message.replace("\"", "\\\""), startTime),
+			contentType: "text/json",
+			encoding: "UTF-8"
+		);
 	}
 	
 };
