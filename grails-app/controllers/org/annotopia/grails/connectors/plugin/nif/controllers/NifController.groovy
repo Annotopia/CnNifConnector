@@ -20,14 +20,14 @@
  */
 package org.annotopia.grails.connectors.plugin.nif.controllers;
 
-import org.annotopia.grails.connectors.BaseController;
+import org.annotopia.grails.connectors.BaseConnectorController;
 import org.annotopia.grails.connectors.IConnectorsParameters;
 import org.annotopia.grails.connectors.MiscUtils;
 import org.codehaus.groovy.grails.web.json.JSONObject;
 
 /** Controller to handle incoming queries to the NIF text mining service.
  * @author Tom Wilkin */
-class NifController extends BaseController {
+class NifController extends BaseConnectorController {
 
 	/** The API key authentication service. */
 	def apiKeyAuthenticationService;
