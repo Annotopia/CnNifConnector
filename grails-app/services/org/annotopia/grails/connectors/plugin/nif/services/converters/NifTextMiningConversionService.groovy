@@ -20,40 +20,29 @@
  */
 package org.annotopia.grails.connectors.plugin.nif.services.converters
 
-import java.text.SimpleDateFormat;
+import java.text.SimpleDateFormat
 import java.util.regex.Matcher
 import java.util.regex.Pattern
-import org.annotopia.grails.connectors.utils.UUID;
-import org.annotopia.grails.connectors.vocabularies.IOAccessRestrictions;
-import org.annotopia.grails.connectors.vocabularies.IODomeo;
-import org.annotopia.grails.connectors.vocabularies.IODublinCoreTerms;
-import org.annotopia.grails.connectors.vocabularies.IOFoaf;
-import org.annotopia.grails.connectors.vocabularies.IOJsonLd;
-import org.annotopia.grails.connectors.vocabularies.IOOpenAnnotation;
-import org.annotopia.grails.connectors.vocabularies.IOPav;
-import org.annotopia.grails.connectors.vocabularies.IORdfs;
-import org.codehaus.groovy.grails.web.json.JSONArray;
-import org.codehaus.groovy.grails.web.json.JSONObject;
+
+import org.annotopia.grails.connectors.converters.BaseTextMiningConversionService
+import org.annotopia.grails.connectors.utils.UUID
+import org.annotopia.grails.connectors.vocabularies.IOAccessRestrictions
+import org.annotopia.grails.connectors.vocabularies.IODomeo
+import org.annotopia.grails.connectors.vocabularies.IODublinCoreTerms
+import org.annotopia.grails.connectors.vocabularies.IOFoaf
+import org.annotopia.grails.connectors.vocabularies.IOJsonLd
+import org.annotopia.grails.connectors.vocabularies.IOOpenAnnotation
+import org.annotopia.grails.connectors.vocabularies.IOPav
+import org.annotopia.grails.connectors.vocabularies.IORdfs
+import org.codehaus.groovy.grails.web.json.JSONArray
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 /** Convert the text mining results from the Nif service into the default format.
  * @author Tom Wilkin */
-class NifTextMiningConversionService {
+class NifTextMiningConversionService extends BaseTextMiningConversionService {
 
 	/** The return format that this conversion service generates. */
 	public static final String RETURN_FORMAT = "annotopia";
-	
-	/** Constants for the URNs. */
-	private static final String URN_SNIPPET_PREFIX = "urn:domeo:contentsnippet:uuid:";
-	private static final String URN_ANNOTATION_SET_PREFIX = "urn:domeo:annotationset:uuid:";
-	private static final String URN_ANNOTATION_PREFIX = "urn:domeo:annotation:uuid:";
-	private static final String URN_SPECIFIC_RESOURCE_PREFIX = "urn:domeo:specificresource:uuid:";
-	private static final String URN_SELECTOR_PREFIX = "urn:domeo:selector:uuid:";
-	
-	/* Maximum lengths for prefixes and suffixes. */
-	private static final int MAX_LENGTH_PREFIX_AND_SUFFIX = 50;
-	
-	/** The date format for the creation date stamps. */
-	private SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss Z");
 	
 	/** Convert the returned JSON into the correct format returned by Annotopia.
 	 * @param json The JSON response from the web service.
@@ -129,52 +118,7 @@ class NifTextMiningConversionService {
 		return result;
 	}
 	
-	/** Search for a match in the selected text.
-	 * @param textToAnnotate The text to search within.
-	 * @param putativeExactMatch The exact text to match.
-	 * @param start The start index for the search.
-	 * @return The matches, or null if it cannot be found. */
-	private def searchForMatch(final String textToAnnotate, final String putativeExactMatch, 
-			final int start)
-	{
-		String matchRegex = putativeExactMatch.replaceAll(/\s+/,"\\\\s+")
-		matchRegex = matchRegex.replaceAll("[)]", "\\\\)")
-		matchRegex = matchRegex.replaceAll("[(]", "\\\\(")
-		Pattern pattern = Pattern.compile("\\b${matchRegex}\\b", Pattern.MULTILINE | Pattern.CASE_INSENSITIVE)
-		Matcher matcher = pattern.matcher(textToAnnotate)
-		int startPos = -1
-		int endPos = -1
-		if (matcher.find(start)) {
-			println 'in'
-			startPos = matcher.start()
-			endPos = matcher.end()
-			String exactMatch = textToAnnotate[startPos..endPos - 1]
-			
-			String prefix = null;
-			if(startPos == 0) {
-				prefix = '';
-			} else {
-				 prefix = textToAnnotate.getAt([
-					 Math.max(startPos - (MAX_LENGTH_PREFIX_AND_SUFFIX + 1), 0)..Math.max(0, startPos - 1)
-				])
-			}
-			
-			String suffix = null;
-			if(Math.min(endPos, textToAnnotate.length() - 1)==Math.min(startPos + MAX_LENGTH_PREFIX_AND_SUFFIX, textToAnnotate.length()-1)) {
-				suffix = "";
-			} else {
-				suffix = textToAnnotate.getAt([
-					Math.min(endPos, textToAnnotate.length() - 1)..Math.min(startPos + MAX_LENGTH_PREFIX_AND_SUFFIX, textToAnnotate.length()-1)
-				])
-			}
-			
-			return ['offset':startPos,'prefix': prefix, 'exact': exactMatch, 'suffix': suffix]
-		}else{
-			println 'out'
-			return null
-		}
 
-	}
 	
 	/** Create the selector content.
 	 * @param text The text to search the content for.
@@ -221,13 +165,4 @@ class NifTextMiningConversionService {
 		annotator.put(IOPav.version, "1.0");
 		return annotator;
 	}
-	
-	/** @return Create the public permissions content. */
-	private JSONObject getPublicPermissions( ) {
-		JSONObject permissions = new JSONObject( );
-		permissions.put("permissions:isLocked", "false");
-		permissions.put("permissions:accessType", "urn:domeo:access:public");
-		return permissions;
-	}
-	
 };
