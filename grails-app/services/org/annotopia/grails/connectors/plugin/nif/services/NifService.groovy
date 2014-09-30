@@ -20,26 +20,18 @@
  */
 package org.annotopia.grails.connectors.plugin.nif.services
 
-import groovy.json.JsonSlurper
 import groovyx.net.http.ContentType
 import groovyx.net.http.HTTPBuilder
 import groovyx.net.http.Method
 
-import java.util.HashMap;
-
-import org.annotopia.grails.connectors.BaseConnectorService;
-import org.annotopia.grails.connectors.ConnectorsConfigAccessService;
-import org.annotopia.grails.connectors.IConnectorsParameters;
-import org.annotopia.grails.connectors.ITermSearchService;
-import org.annotopia.grails.connectors.ITextMiningService;
-import org.annotopia.grails.connectors.MiscUtils;
-import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTermSearchConversionService;
-import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTermSearchDomeoConversionService;
-import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTextMiningConversionService;
-import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTextMiningDomeoConversionService;
-import org.apache.http.HttpHost;
-import org.apache.http.conn.params.ConnRoutePNames;
-import org.codehaus.groovy.grails.web.json.JSONObject;
+import org.annotopia.grails.connectors.BaseConnectorService
+import org.annotopia.grails.connectors.IConnectorsParameters
+import org.annotopia.grails.connectors.ITermSearchService
+import org.annotopia.grails.connectors.ITextMiningService
+import org.annotopia.grails.connectors.MiscUtils
+import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTermSearchConversionService
+import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTermSearchDomeoConversionService
+import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
  * Implementation of the Nif Term Search connector for Annotopia.
