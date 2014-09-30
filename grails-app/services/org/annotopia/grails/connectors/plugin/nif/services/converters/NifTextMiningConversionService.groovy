@@ -146,13 +146,11 @@ class NifTextMiningConversionService extends BaseTextMiningConversionService {
 	
 	/** @return Create the connector agent content. */
 	private JSONObject getConnectorAgent( ) {
-		JSONObject result = new JSONObject( );
-		result.put(IOJsonLd.jsonLdId, "urn:domeo:software:service:ConnectorNifServer:0.1-001");
-		result.put(IOJsonLd.jsonLdType, "foafx:Software");
-		result.put(IORdfs.label, "NifConnector");
-		result.put(IOFoaf.name, "NifConnector");
-		result.put(IOPav.version, "0.1 b001");		
-		return result;
+		return getConnectorAgent(
+			"urn:domeo:software:service:ConnectorNifServer:0.1-001",
+			"NifConnector",
+			"NifConnector",
+			"0.1 b001")		
 	}
 	
 	/** @return Create the annotator agent content. */
