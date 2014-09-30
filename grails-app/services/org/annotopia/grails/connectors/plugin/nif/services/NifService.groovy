@@ -31,6 +31,8 @@ import org.annotopia.grails.connectors.ITextMiningService
 import org.annotopia.grails.connectors.MiscUtils
 import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTermSearchConversionService
 import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTermSearchDomeoConversionService
+import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTextMiningConversionService
+import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTextMiningDomeoConversionService
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
