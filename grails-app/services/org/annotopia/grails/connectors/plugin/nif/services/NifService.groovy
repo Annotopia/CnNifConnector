@@ -133,16 +133,4 @@ class NifService extends BaseConnectorService implements ITermSearchService, ITe
 			return null;
 		}
 	}
-	
-	/** URL encode the content of the given string.
-	 * @param content The content to URL encode.
-	 * @return The URL encoded content. */
-	private String encodeContent(final String content) {
-		if(content == null || content.trim( ).length( ) == 0) { 
-			throw new RuntimeException("No content found.");
-		} else {
-			return URLEncoder.encode(content.trim( ), MiscUtils.DEFAULT_ENCODING);
-		}
-	}
-
 };
