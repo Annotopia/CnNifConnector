@@ -146,7 +146,7 @@ class NifTextMiningConversionService extends BaseTextMiningConversionService {
 	
 	/** @return Create the connector agent content. */
 	private JSONObject getConnectorAgent( ) {
-		return getConnectorAgent(
+		return getSoftwareAgent(
 			"urn:domeo:software:service:ConnectorNifServer:0.1-001",
 			"NifConnector",
 			"NifConnector",
@@ -155,12 +155,10 @@ class NifTextMiningConversionService extends BaseTextMiningConversionService {
 	
 	/** @return Create the annotator agent content. */
 	private JSONObject getAnnotatorAgent( ) {
-		JSONObject annotator = new JSONObject( );
-		annotator.put(IOJsonLd.jsonLdId, "http://nif-services.neuinfo.org/servicesv1/resource_AnnotateService.html");
-		annotator.put(IOJsonLd.jsonLdType, "foafx:Software");
-		annotator.put(IORdfs.label, "NIF Annotator Web Service");
-		annotator.put(IOFoaf.name, "NIF Annotator Web Service");
-		annotator.put(IOPav.version, "1.0");
-		return annotator;
+		return getSoftwareAgent(
+			"http://nif-services.neuinfo.org/servicesv1/resource_AnnotateService.html",
+			"NIF Annotator Web Service",
+			"NIF Annotator Web Service",
+			"1.0");
 	}
 };
