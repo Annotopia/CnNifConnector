@@ -10,7 +10,7 @@ class UrlMappings {
 		
 		"/cn/nif/textmine" {
 			controller = "nif"
-			action = [GET: "textmine"]
+			action = [POST: "textmine"]
 		}
 		
 		"/$controller/$action?/$id?"{
