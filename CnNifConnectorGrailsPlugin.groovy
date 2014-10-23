@@ -10,6 +10,7 @@ class CnNifConnectorGrailsPlugin {
 
     // TODO Fill in these fields
     def title = "Cn Nif Connector Plugin" // Headline display name of the plugin
+	def service = "org.annotopia.grails.connectors.plugin.nif.services.NifService"
     def author = "Dr. Paolo Ciccarese"
     def authorEmail = "paolo.ciccarese@gmail.com"
     def description = '''\
