@@ -8,8 +8,8 @@ class CnNifConnectorGrailsPlugin {
         "grails-app/views/error.gsp"
     ]
 
-    // TODO Fill in these fields
     def title = "Cn Nif Connector Plugin" // Headline display name of the plugin
+	def service = "NifService"
     def author = "Dr. Paolo Ciccarese"
     def authorEmail = "paolo.ciccarese@gmail.com"
     def description = '''\
