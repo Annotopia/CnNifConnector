@@ -35,7 +35,9 @@ class NifController extends BaseConnectorController {
 	/** The instance of the NIF service to use for the queries. */
 	def nifService;
 	
-	// curl -i -X GET http://localhost:8080/cn/nif/search --header "Content-Type: application/json" --data '{"q":"plank", "resource":"nlx_144509-1", "format":"domeo"}'
+	// curl -i -X GET http://localhost:8090/cn/nif/search --header "Content-Type: application/json" --data '{"q":"APP", "resource":"nif-0000-07730-1", "format":"domeo", "apiKey":"164bb0e0-248f-11e4-8c21-0800200c9a66"}'
+	// curl -i -X GET http://localhost:8090/cn/nif/search --header "Content-Type: application/json" --data '{"q":"Rat", "resource":"nlx_154697-1", "format":"domeo", "apiKey":"164bb0e0-248f-11e4-8c21-0800200c9a66"}'
+	// curl -i -X GET http://localhost:8090/cn/nif/search --header "Content-Type: application/json" --data '{"q":"max", "resource":"nlx_144509-1", "format":"domeo", "apiKey":"164bb0e0-248f-11e4-8c21-0800200c9a66"}'
 	/** Perform a term search on NIF and return the JSON results. 
 	 * @param resource The resource to perform the term search on.
 	 * @param q The term to search for.
