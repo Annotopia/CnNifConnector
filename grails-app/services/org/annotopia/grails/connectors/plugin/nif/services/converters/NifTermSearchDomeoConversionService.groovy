@@ -20,6 +20,8 @@
  */
 package org.annotopia.grails.connectors.plugin.nif.services.converters
 
+import org.annotopia.grails.connectors.plugin.nif.utils.converters.domeo.NIfIntegratedAnimalsDomeoConverter;
+import org.annotopia.grails.connectors.plugin.nif.utils.converters.domeo.NIfRegistryDomeoConverter;
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 
@@ -33,27 +35,15 @@ class NifTermSearchDomeoConversionService {
 	/** Convert the returned JSON into the correct format for consumption by Domeo.
 	 * @param response The JSON response from the web service.
 	 * @return The JSON in the Domeo format. */
-	public JSONObject convert(def response) {
-		JSONObject result = new JSONObject( );
-		result.put("pagesize", 1);
-		result.put("pagenumber", 1);
-		result.put("totalpages", 1);
+	public JSONObject convert(def resource, def response) {
 		
-		// iterate through the terms
-		JSONArray terms = new JSONArray( );
-		response.result.result.each {
-			JSONObject term = new JSONObject( );
-			
-			term.put("termUri", it["url"]);
-			term.put("description", it["description"]);
-			term.put("termLabel", it["resource_name"]);			
-			term.put("sourceUri", "http://www.neuinfo.org");
-			term.put("sourceLabel", "NIF");
-			terms.add(term);
+		if(NIfRegistryDomeoConverter.canConvert(resource)) {
+			NIfRegistryDomeoConverter converter = new NIfRegistryDomeoConverter();
+			return converter.convert(response);
+		} else if(NIfIntegratedAnimalsDomeoConverter.canConvert(resource)) {
+			NIfIntegratedAnimalsDomeoConverter converter = new NIfIntegratedAnimalsDomeoConverter();
+			return converter.convert(response);
 		}
-		result.put("terms", terms);
-		
-		return result;
 	}
 	
 };

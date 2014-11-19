@@ -20,7 +20,8 @@
  */
 package org.annotopia.grails.connectors.plugin.nif.services.converters
 
-import org.codehaus.groovy.grails.web.json.JSONArray
+import org.annotopia.grails.connectors.plugin.nif.utils.converters.NIfIntegratedAnimalsConverter
+import org.annotopia.grails.connectors.plugin.nif.utils.converters.NIfRegistryConverter
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 /** Convert the terms returned by the Nif Service into the default format.
@@ -34,8 +35,9 @@ class NifTermSearchConversionService {
 	 * @param response The JSON response from the web service.
 	 * @param duration The number of milliseconds that the query took.
 	 * @return The JSON in the Annotopia format. */
-	public JSONObject convert(def response, final long duration) {		
-		JSONObject result = new JSONObject( );
+	public JSONObject convert(def resource, def response, final long duration) {	
+		
+		JSONObject result = new JSONObject();
 		result.put("duration", duration + "ms");
 		result.put("total", 1);
 		result.put("max", 1);
@@ -45,23 +47,14 @@ class NifTermSearchConversionService {
 		result.put("nextPage", "none");
 		result.put("prevPage", "none");
 		
-		// iterate through the items
-		JSONArray items = new JSONArray( );
-		response.result.result.each {
-			JSONObject item = new JSONObject( );
-			
-			item.put("label", it["resource_name"]);
-			item.put("description", it["description"]);
-			item.put("@id", it["url"]);
-			
-			JSONObject source = new JSONObject( );
-			source.put("@id", "http://www.neuinfo.org");
-			source.put("label", "NIF");
-			item.put("isDefinedBy", source);
-			items.add(item);
+		if(NIfRegistryConverter.canConvert(resource)) {
+			NIfRegistryConverter converter = new NIfRegistryConverter();
+			result.put("items",converter.convert(response).get("items"));
+		} else if(NIfIntegratedAnimalsConverter.canConvert(resource)) {
+			NIfIntegratedAnimalsConverter converter = new NIfIntegratedAnimalsConverter();
+			result.put("items",converter.convert(response).get("items"));
 		}
-		result.put("items", items);
-		
+					
 		JSONObject converted = new JSONObject( );
 		converted.put("status", "results");
 		converted.put("result", result);
