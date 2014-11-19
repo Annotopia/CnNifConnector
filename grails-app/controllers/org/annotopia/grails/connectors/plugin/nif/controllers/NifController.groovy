@@ -29,6 +29,10 @@ import org.codehaus.groovy.grails.web.json.JSONObject;
  * @author Tom Wilkin */
 class NifController extends BaseConnectorController {
 
+	/** Used by superclass **/
+	def connectorsConfigAccessService;
+	def configAccessService;
+	
 	/** The API key authentication service. */
 	def apiKeyAuthenticationService;
 	
@@ -108,62 +112,6 @@ class NifController extends BaseConnectorController {
 		
 		response.outputStream << results.toString( );
 		response.outputStream.flush( );
-	}
-	
-	/** Retrieve the API key value.
-	 * @param startTime The time this execution was started.
-	 * @return The value of the API key, or null if it is not set. */
-	private String retrieveApiKey(final long startTime) {
-		// retrieve the API key
-		def apiKey = retrieveValue(request.JSON.apiKey, params.apiKey, 
-				"Missing required parameter 'apiKey'.", startTime);
-		if(!apiKeyAuthenticationService.isApiKeyValid(request.getRemoteAddr( ), apiKey)) {
-			invalidApiKey(request.getRemoteAddr( ));
-			return null;
-		}
-		
-		return apiKey;
-	}
-	
-	/** Retrieve the user parameter.
-	 * @param requestParam The parameter if it exists in the POST data.
-	 * @param param The parameter if it exists in the URL.
-	 * @param name The name of this parameter.
-	 * @param startTime The time this execution was started.
-	 * @return The value of this parameter, or null if it is not set. */
-	private String retrieveValue(final String requestParam, final String param, final String name, 
-			final long startTime)
-	{
-		def result;
-		if(requestParam != null) {
-			result = requestParam;
-		} else if(param != null) {
-			result = URLDecoder.decode(param, MiscUtils.DEFAULT_ENCODING);
-		} else {
-			error(400, "Missing required parameter '" + name + "'.", startTime);
-			return null;
-		}
-		
-		if(result.isEmpty( )) {
-			error(400, "Parameter '" + name + "' is empty.", startTime);
-		}
-		return result;
-	}
-	
-	/** Retrieve the user parameter.
-	 * @param requestParam The parameter if it exists in the POST data.
-	 * @param param The parameter if it exists in the URL.
-	 * @param defaultValue The default value to use if the parameter is not set.
-	 * @return The value of this parameter. */
-	private String retrieveValue(final String requestParam, final String param, 
-			final String defaultValue)
-	{
-		if(requestParam != null) {
-			return requestParam;
-		} else if(param != null) {
-			return URLDecoder.decode(param, MiscUtils.DEFAULT_ENCODING);
-		} 
-		return defaultValue;
 	}
 	
 	/** Generate an error with the specified details.
