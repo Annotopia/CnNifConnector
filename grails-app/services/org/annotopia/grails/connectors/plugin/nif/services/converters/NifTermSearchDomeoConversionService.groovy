@@ -20,9 +20,9 @@
  */
 package org.annotopia.grails.connectors.plugin.nif.services.converters
 
-import org.annotopia.grails.connectors.plugin.nif.utils.converters.domeo.NIfIntegratedAnimalsDomeoConverter;
-import org.annotopia.grails.connectors.plugin.nif.utils.converters.domeo.NIfRegistryDomeoConverter;
-import org.codehaus.groovy.grails.web.json.JSONArray
+import org.annotopia.grails.connectors.plugin.nif.utils.converters.domeo.NIfAntibodiesDomeoConverter
+import org.annotopia.grails.connectors.plugin.nif.utils.converters.domeo.NIfIntegratedAnimalsDomeoConverter
+import org.annotopia.grails.connectors.plugin.nif.utils.converters.domeo.NIfRegistryDomeoConverter
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 /** Convert the terms returned by the Nif Service into the Domeo format.
@@ -43,7 +43,9 @@ class NifTermSearchDomeoConversionService {
 		} else if(NIfIntegratedAnimalsDomeoConverter.canConvert(resource)) {
 			NIfIntegratedAnimalsDomeoConverter converter = new NIfIntegratedAnimalsDomeoConverter();
 			return converter.convert(response);
+		} else if(NIfAntibodiesDomeoConverter.canConvert(resource)) {
+			NIfAntibodiesDomeoConverter converter = new NIfAntibodiesDomeoConverter();
+			return converter.convert(response);
 		}
 	}
-	
 };

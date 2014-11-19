@@ -73,7 +73,7 @@ class NifService extends BaseConnectorService implements ITermSearchService, ITe
 					
 					response.success = { resp, json ->
 						long duration = System.currentTimeMillis( ) - startTime;
-						
+
 						// convert the result
 						boolean isFormatDefined = parameters.containsKey(IConnectorsParameters.RETURN_FORMAT);
 						if(isFormatDefined && parameters.get(IConnectorsParameters.RETURN_FORMAT)
