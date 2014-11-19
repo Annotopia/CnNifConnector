@@ -79,9 +79,9 @@ class NifService extends BaseConnectorService implements ITermSearchService, ITe
 						if(isFormatDefined && parameters.get(IConnectorsParameters.RETURN_FORMAT)
 								.equals(NifTermSearchDomeoConversionService.RETURN_FORMAT))
 						{
-							return new NifTermSearchDomeoConversionService( ).convert(json);
+							return new NifTermSearchDomeoConversionService( ).convert(resource, json);
 						} else {
-							return new NifTermSearchConversionService( ).convert(json, duration);
+							return new NifTermSearchConversionService( ).convert(resource, json, duration);
 						}
 					}
 					
