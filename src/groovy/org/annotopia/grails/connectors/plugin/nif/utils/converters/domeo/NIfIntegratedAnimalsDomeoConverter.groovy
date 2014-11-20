@@ -51,7 +51,7 @@ class NIfIntegratedAnimalsDomeoConverter implements IConvert {
 			JSONObject term = new JSONObject( );
 			
 			term.put("termUri", it["url_p"]);
-			term.put("description", it["description"]);
+			term.put("description", "Database: " + it["database"]);
 			term.put("termLabel", it["Name"]);
 			term.put("sourceUri", "http://www.neuinfo.org");
 			term.put("sourceLabel", "NIF");
