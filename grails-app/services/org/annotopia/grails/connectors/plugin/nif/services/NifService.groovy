@@ -34,6 +34,7 @@ import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTermSea
 import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTermSearchDomeoConversionService
 import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTextMiningConversionService
 import org.annotopia.grails.connectors.plugin.nif.services.converters.NifTextMiningDomeoConversionService
+import org.annotopia.grails.connectors.plugin.nif.utils.NifAntibodiesUrlComposer
 import org.codehaus.groovy.grails.web.json.JSONObject
 
 /**
@@ -56,12 +57,21 @@ class NifService extends BaseConnectorService implements ITermSearchService, ITe
 				
 		try {
 			// create the URL
+			
+			
 			String resource = parameters.get("resource");
 			def url = TERM_SEARCH_URL + resource + "?exportType=all";
 			if(content != null) {
 				url += "&q=" + encodeContent(content);
 			}
-		
+			
+			if(resource=="nif-0000-07730-1") {
+				NifAntibodiesUrlComposer urlcomposer = new NifAntibodiesUrlComposer();
+				url = urlcomposer.getUrl(TERM_SEARCH_URL, encodeContent(content), parameters);
+				println url
+			} 
+			
+
 			// perform the query
 			long startTime = System.currentTimeMillis( );
 			try {
@@ -74,6 +84,8 @@ class NifService extends BaseConnectorService implements ITermSearchService, ITe
 					response.success = { resp, json ->
 						long duration = System.currentTimeMillis( ) - startTime;
 
+						println json
+						
 						// convert the result
 						boolean isFormatDefined = parameters.containsKey(IConnectorsParameters.RETURN_FORMAT);
 						if(isFormatDefined && parameters.get(IConnectorsParameters.RETURN_FORMAT)

@@ -71,10 +71,15 @@ class NifController extends BaseConnectorController {
 			return;
 		}
 		
+		def type = retrieveValue(request.JSON.type, params.type, "");
+		def vendor = retrieveValue(request.JSON.vendor, params.vendor, "");
+		
 		// perform the query
 		HashMap parameters = new HashMap( );
 		parameters.put(IConnectorsParameters.RETURN_FORMAT, format);
 		parameters.put("resource", resource);
+		parameters.put("vendor", vendor);
+		parameters.put("type", type);
 		
 		JSONObject results = nifService.search(query, parameters);
 		
