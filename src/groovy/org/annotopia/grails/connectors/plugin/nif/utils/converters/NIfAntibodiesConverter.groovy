@@ -18,18 +18,19 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-package org.annotopia.grails.connectors.plugin.nif.utils.converters.domeo
+package org.annotopia.grails.connectors.plugin.nif.utils.converters
 
 import org.annotopia.grails.connectors.plugin.nif.utils.converters.IConvert;
 import org.codehaus.groovy.grails.web.json.JSONArray
 import org.codehaus.groovy.grails.web.json.JSONObject
 
+
 /**
  * @author Paolo Ciccarese <paolo.ciccarese@gmail.com>
  */
-class NIfAntibodiesDomeoConverter implements IConvert {
+class NIfAntibodiesConverter implements IConvert {
 
-	static String RESOURCE_ID = "nif-0000-07730-1"
+	static String RESOURCE_ID = "nlx_154697-1"
 	
 	static final String ANTIBODY_TERM_URL ="http://ontology.neuinfo.org/NIF/DigitalEntities/NIF-Investigation.owl#birnlex_2110"
 	static final String ANTIBODY_REGISTRY_URL = "http://www.antibodyregistry.org"
@@ -39,20 +40,15 @@ class NIfAntibodiesDomeoConverter implements IConvert {
 		return resource==RESOURCE_ID;
 	}
 	
-	/** Convert the returned JSON into the correct format for consumption by Domeo.
+	/** Convert the returned JSON into the general format..
 	 * @param response The JSON response from the web service.
-	 * @return The JSON in the Domeo format. */
+	 * @return The JSON in the general format. */
 	public JSONObject convert(def response) {
 
-		//println '----------- ' + response
-		
 		JSONObject result = new JSONObject( );
-		result.put("pagesize", 1);
-		result.put("pagenumber", 1);
-		result.put("totalpages", 1);
 		
-		// iterate through the terms
-		JSONArray terms = new JSONArray( );
+		// iterate through the items
+		JSONArray items = new JSONArray( );
 		response.result.result.each { item ->
 			JSONObject term = new JSONObject( );
 			
@@ -71,9 +67,14 @@ class NIfAntibodiesDomeoConverter implements IConvert {
 			term.put("hostOrganism", item["Host Organism"]);
 			term.put("sourceUri", ANTIBODY_REGISTRY_URL);
 			term.put("sourceLabel", ANTIBODY_REGISTRY_LABEL);
-			terms.add(term);
+			
+			JSONObject source = new JSONObject( );
+			source.put("@id", "http://www.neuinfo.org");
+			source.put("label", "NIF");
+			term.put("isDefinedBy", source);
+			items.add(term);
 		}
-		result.put("terms", terms);
+		result.put("items", items);
 		
 		return result;
 	}
