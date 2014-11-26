@@ -118,19 +118,4 @@ class NifController extends BaseConnectorController {
 		response.outputStream << results.toString( );
 		response.outputStream.flush( );
 	}
-	
-	/** Generate an error with the specified details.
-	 * @param code The HTTP error code to use.
-	 * @param message The error message to report to the user.
-	 * @param startTime The time the web service call was initiated. */
-	private void error(final int code, final String message, final long startTime) {
-		log.warn(message);
-		render(
-			status: code,
-			text: returnMessage("", "nocontent", message.replace("\"", "\\\""), startTime),
-			contentType: "text/json",
-			encoding: "UTF-8"
-		);
-	}
-	
 };

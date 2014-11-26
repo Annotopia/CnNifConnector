@@ -13,7 +13,7 @@ class CnNifConnectorGrailsPlugin {
     def author = "Dr. Paolo Ciccarese"
     def authorEmail = "paolo.ciccarese@gmail.com"
     def description = '''\
-Cn Nif Connector Plugin.
+Nif Connector Plugin.
 '''
 
     // URL to the plugin's documentation
