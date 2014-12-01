@@ -195,4 +195,21 @@ class NifTextMiningDomeoConversionService extends BaseTextMiningConversionServic
 		return domeo;
 	}
 	
+	/**
+	 * It creates a JSON object for the connector agent (software).
+	 * @param uri	The Agent URI
+	 * @param label	The Agent label
+	 * @param name	The Agent name, can be the same as the label
+	 * @param ver	The Agent version
+	 * @return Create the connector agent content.
+	 */
+	protected JSONObject getSoftwareAgent(String uri, String label, String name, String ver) {
+		JSONObject result = new JSONObject( );
+		result.put(IOJsonLd.jsonLdId, uri);
+		result.put(IOJsonLd.jsonLdType, "foafx:Software");
+		result.put(IORdfs.label, label);
+		result.put("foafx:name", name);
+		result.put(IOPav.version, ver);
+		return result;
+	}
 };
